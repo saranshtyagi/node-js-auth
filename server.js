@@ -4,6 +4,7 @@ const connectToDB = require("./database/db");
 const authRoutes = require('./routes/auth-routes.js');
 const homeRoutes = require('./routes/home-routes.js'); 
 const adminRoutes = require('./routes/admin-routes.js');
+const uploadImageRoutes = require('./routes/image-routes.js');
 
 const app = express(); 
 
@@ -15,6 +16,7 @@ connectToDB();
 app.use('/api/auth', authRoutes);
 app.use('/api/home', homeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/image', uploadImageRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
