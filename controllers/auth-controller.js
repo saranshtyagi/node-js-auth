@@ -90,7 +90,56 @@ const loginUser = async(req, res) => {
     }
 }
 
+const changePassword = async(req, res) =>{
+    try {
+        const userId = req.userInfo.userId; 
+        
+        //from the frontend, extract old and new password entered. also to check if both old and new are same, do it in frontend rather than in backend
+        const { oldPassword, newPassword } = req.body; 
+
+        const user = await User.findById(userId); 
+
+        if(!user) {
+            return res.status(400).json({
+                success: false, 
+                message: "User doesn't exist!"
+            });
+        }
+
+        //check if the user has entered the same old password stored in database or not. 
+        const isPasswordMatch = await bcrypt.compare(oldPassword, user.password);
+
+        if(!isPasswordMatch) {
+            return res.status(400).json({
+                success: false, 
+                message: 'Old password entered is wrong!'
+            });
+        }
+
+        //hash the new password before storing in db
+        const salt = await bcrypt.genSalt(10); 
+        const hashedNewPassword = await bcrypt.hash(newPassword, salt);
+        
+        //update password
+        user.password = hashedNewPassword; 
+        await user.save();
+
+        res.status(200).json({
+            success: false, 
+            message: 'Password changed successfully!'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false, 
+            message: 'Something went wrong. Please try again!',
+            error: error.message
+        })
+    }
+}
+
+
 module.exports = {
     registerUser, 
-    loginUser
+    loginUser, 
+    changePassword
 }
